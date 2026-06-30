@@ -1,1005 +1,284 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ระบบลงเวลาเรียน - โรงเรียนโชคชัยสามัคคี</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <script src="https://unpkg.com/dexie@3.2.4/dist/dexie.min.js"></script>
-  <style>
-    body {
-      background-color: #f8f9fa;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-    .saved-subject {
-      color: #198754 !important;
-      font-weight: bold;
-    }
-    #browserWarningBanner {
-      display: none;
-      background-color: #dc3545;
-      color: white;
-      text-align: center;
-      padding: 10px;
-      position: fixed;
-      top: 0;
-      width: 100%;
-      z-index: 9999;
-    }
-    .loading-overlay {
-      display: none;
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(255,255,255,0.8);
-      z-index: 10000;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-    }
-    /* Styles สำหรับหน้าต่างพิมพ์รายงาน */
-    .report-header-title { font-size: 20px; font-weight: bold; text-align: center; }
-    .report-header-sub { font-size: 14px; text-align: center; margin-bottom: 15px; }
-    .report-info-block { border: 1px solid #ccc; padding: 10px; margin-bottom: 15px; border-radius: 5px; background: #fff; }
-    .report-summary-section { margin-bottom: 15px; padding: 5px; }
-    .report-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-    .report-table th, .report-table td { border: 1px solid #000; padding: 8px; text-align: center; }
-    .report-table th { background-color: #f2f2f2; }
-    .report-table .text-left { text-align: left; }
-    .report-sign-area { margin-top: 30px; }
-    .report-sign-table { width: 100%; }
-    .report-sign-table td { width: 33.33%; text-align: center; padding-top: 40px; font-size: 13px; vertical-align: top; }
-    @media print {
-      .no-print { display: none !important; }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบเช็คชื่อนักเรียนวงโยธวาทิตโรงเรียนโชคชัยสามัคคี</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Sarabun', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.7)), 
+                        url('โยธวา.jpg') no-repeat center center fixed;
+            background-size: cover;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+        }
+
+        .login-container {
+            background: rgba(255, 255, 255, 0.98);
+            max-width: 450px;
+            width: 100%;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
+            overflow: hidden;
+            display: block;
+        }
+
+        .login-header {
+            background: #ffffff;
+            padding: 35px 20px 20px 20px;
+            text-align: center;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .logo-img {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 15px auto;
+            display: block;
+            border-radius: 50%;
+            box-shadow: 0 6px 15px rgba(123, 44, 191, 0.25);
+            object-fit: cover;
+            background: white;
+            border: 4px solid #7B2CBF;
+        }
+
+        .main-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #3C096C; 
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+
+        .sub-title-1, .sub-title-2 {
+            font-size: 11px; 
+            font-weight: 500;
+            color: #000000; 
+            line-height: 1.5;
+            margin: 0;
+            display: block;
+        }
+
+        .login-body {
+            padding: 30px 25px;
+            background: #ffffff;
+        }
+
+        .form-view {
+            display: none;
+        }
+
+        .form-view.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333333;
+            font-size: 14px;
+            text-align: left;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #cbd5e1;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            outline: none;
+            background: #f8fafc;
+            color: #333333;
+        }
+
+        .form-control:focus {
+            border-color: #7B2CBF;
+            background: #ffffff;
+            box-shadow: 0 0 0 3.5px rgba(123, 44, 191, 0.15);
+        }
+
+        .btn-submit {
+            display: block;
+            text-align: center;
+            text-decoration: none;
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #7B2CBF 0%, #5A189A 100%);
+            border: none;
+            border-radius: 10px;
+            color: #ffffff;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(123, 44, 191, 0.3);
+        }
+
+        .btn-submit:hover {
+            background: linear-gradient(135deg, #5A189A 0%, #3C096C 100%);
+            transform: translateY(-1.5px);
+            box-shadow: 0 7px 18px rgba(123, 44, 191, 0.4);
+        }
+
+        .toggle-btn-container {
+            margin-top: 25px;
+            text-align: center;
+            border-top: 1px solid #f1f5f9;
+            padding-top: 15px;
+        }
+
+        .toggle-link {
+            color: #7B2CBF;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .toggle-link:hover {
+            text-decoration: underline;
+        }
+
+        .footer-text {
+            text-align: center;
+            margin-top: 25px;
+            font-size: 11px;
+            color: #777777;
+            line-height: 1.4;
+        }
+    </style>
 </head>
 <body>
 
-  <div id="browserWarningBanner">
-    ⚠️ ตรวจพบการใช้งานผ่านแอป (เช่น Facebook/Messenger) เพื่อการใช้งานที่เสถียรและบันทึกข้อมูลออฟไลน์ได้ กรุณาเปิดด้วยเบราว์เซอร์หลักของเครื่อง (Chrome หรือ Safari)
-  </div>
+    <div class="login-container">
+        <div class="login-header">
+            <img class="logo-img" src="icon-512.png" alt="CH SPEED BAND LOGO">
+            <div class="main-title">ระบบเช็คชื่อนักเรียนวงโยธวาทิต<br>โรงเรียนโชคชัยสามัคคี</div>
+            <span class="sub-title-1">สังกัดสำนักงานเขตพื้นที่การศึกษามัธยมศึกษานครราชสีมา</span>
+            <span class="sub-title-2">กระทรวงศึกษาธิการ</span>
+        </div>
 
-  <div id="uploadLoadingOverlay" class="loading-overlay">
-    <div class="spinner-border text-primary" role="status"></div>
-    <span id="uploadLoadingMessage" class="mt-2 fw-bold text-primary">กำลังดำเนินการ...</span>
-  </div>
-  
-  <div id="deleteLoadingOverlay" class="loading-overlay">
-    <div class="spinner-border text-danger" role="status"></div>
-    <span id="deleteLoadingMessage" class="mt-2 fw-bold text-danger">กำลังลบข้อมูล...</span>
-  </div>
-
-  <div class="container my-4">
-    <h2 class="text-center mb-4 fw-bold text-primary">ระบบลงเวลาเรียนสารสนเทศ (Hybrid Offline)</h2>
-    
-    <div class="card card-body shadow-sm mb-4">
-      <div class="row g-3">
-        <div class="col-md-4">
-          <label class="form-label fw-bold">1. เลือกห้องเรียน / กลุ่มกิจกรรม</label>
-          <select id="roomSelect" class="form-select" onchange="loadSubjectsAndData()">
-            <option value="">-- เลือกห้องเรียน / กลุ่มพิเศษ --</option>
-          </select>
-        </div>
-        <div class="col-md-4">
-          <label class="form-label fw-bold">2. วันที่เช็คชื่อ</label>
-          <input type="date" id="dateInput" class="form-select" onchange="loadSubjectsAndData()">
-        </div>
-        <div class="col-md-4">
-          <label class="form-label fw-bold">3. เลือกวิชาเรียน</label>
-          <select id="subjectSelect" class="form-select" onchange="loadStudents()">
-            <option value="">-- เลือกวิชา --</option>
-          </select>
-        </div>
-      </div>
-      
-      <div class="mt-3 d-flex gap-2 justify-content-end">
-        <button class="btn btn-outline-secondary btn-sm" onclick="openBulkModalWithCurrentData()">⚙️ จัดการรายชื่อห้องนี้</button>
-        <button class="btn btn-outline-info btn-sm" onclick="new bootstrap.Modal(document.getElementById('subjectModal')).show(); refreshModalSubjectList();">📚 ตั้งค่าวิชาเรียน</button>
-      </div>
-    </div>
-
-    <div class="row g-2 mb-4 text-center">
-      <div class="col-6 col-md-3">
-        <div class="bg-white border rounded p-2">
-          <div class="small text-muted">นักเรียนทั้งหมด</div>
-          <div class="fs-4 fw-bold text-dark" id="totalCount">0</div>
-          <div class="small text-muted">(ชาย: <span id="maleCount">0</span> | หญิง: <span id="femaleCount">0</span>)</div>
-        </div>
-      </div>
-      <div class="col-6 col-md-3">
-        <div class="bg-light border rounded p-2 border-success">
-          <div class="small text-success fw-bold">มาเรียน</div>
-          <div class="fs-4 fw-bold text-success" id="presentCount">0</div>
-        </div>
-      </div>
-      <div class="col-6 col-md-3">
-        <div class="bg-light border rounded p-2 border-warning">
-          <div class="small text-warning fw-bold">มาสาย</div>
-          <div class="fs-4 fw-bold text-warning" id="lateCount">0</div>
-        </div>
-      </div>
-      <div class="col-6 col-md-3">
-        <div class="bg-light border rounded p-2 border-danger">
-          <div class="small text-danger fw-bold">ขาดเรียน</div>
-          <div class="fs-4 fw-bold text-danger" id="absentCount">0</div>
-        </div>
-      </div>
-      <div class="col-4 col-md-2 mt-2">
-        <div class="bg-white border rounded p-1">
-          <div class="small text-muted">ลาป่วย: <span class="fw-bold" id="sickCount">0</span></div>
-        </div>
-      </div>
-      <div class="col-4 col-md-2 mt-2">
-        <div class="bg-white border rounded p-1">
-          <div class="small text-muted">ลากิจ: <span class="fw-bold" id="businessCount">0</span></div>
-        </div>
-      </div>
-      <div class="col-4 col-md-3 mt-2">
-        <div class="bg-white border rounded p-1">
-          <div class="small text-muted">กิจกรรมโรงเรียน: <span class="fw-bold" id="activityCount">0</span></div>
-        </div>
-      </div>
-      <div class="col-12 col-md-5 mt-2">
-        <div class="bg-white border rounded p-1">
-          <div class="small text-muted">โดดเรียน / หนีเรียน: <span class="fw-bold text-danger" id="dropCount">0</span></div>
-        </div>
-      </div>
-    </div>
-
-    <div id="bulkSelectArea" class="card card-body mb-3 bg-light border-primary shadow-sm" style="display:none;">
-      <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
-        <div>
-          <span class="fw-bold text-primary">⚡ ทางลัดเลือกสถานะทั้งห้อง:</span>
-          <span id="editStatus" class="badge bg-warning text-dark ms-2" style="display:none;">📝 ตรวจพบข้อมูลเดิม (โหมดแก้ไข)</span>
-        </div>
-        <div class="btn-group flex-wrap">
-          <button class="btn btn-sm btn-success" onclick="setBulkStatus('มา')">มาทุกคน</button>
-          <button class="btn btn-sm btn-warning text-dark" onclick="setBulkStatus('สาย')">สายทั้งหมด</button>
-          <button class="btn btn-sm btn-danger" onclick="setBulkStatus('ขาด')">ขาดทุกคน</button>
-          <button class="btn btn-sm btn-secondary" onclick="setBulkStatus('กิจกรรม')">ไปกิจกรรม</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="table-responsive shadow-sm bg-white rounded">
-      <table class="table table-bordered table-striped table-hover align-middle mb-0">
-        <thead class="table-dark text-center">
-          <tr>
-            <th style="width: 8%;">เลขที่</th>
-            <th style="width: 15%;">เลขประจำตัว</th>
-            <th>ชื่อ-นามสกุล</th>
-            <th style="width: 25%;">เช็คสถานะ</th>
-            <th style="width: 15%;" class="no-print">เครื่องมือ</th>
-          </tr>
-        </thead>
-        <tbody id="studentTableBody">
-          <tr>
-            <td colspan="5" class="text-center py-4 text-muted">💡 กรุณาเลือกห้องเรียน วันที่ และวิชาเรียนให้ครบถ้วนเพื่อแสดงรายชื่อ</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div class="mt-4 d-flex justify-content-between flex-wrap gap-3 no-print">
-      <button id="btnReset" class="btn btn-lg btn-outline-danger px-4" onclick="resetCurrentSelection()" disabled>🔄 รีเซ็ตค่าดั้งเดิม</button>
-      <div class="d-flex gap-2">
-        <button id="btnPrint" class="btn btn-lg btn-secondary px-4" onclick="printOfficialReport()" disabled>🖨️ พิมพ์/ดูตัวอย่างรายงาน</button>
-        <button id="btnSave" class="btn btn-lg btn-primary px-5 fw-bold" onclick="saveData()" disabled>📥 บันทึกข้อมูลเข้าชีต</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal fade" id="bulkStudentModal" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        <div class="modal-header bg-primary text-white">
-          <h5 class="modal-title">⚙️ นำเข้า/แก้ไข รายชื่อกลุ่มกิจกรรมหรือห้องเรียนพิเศษ</h5>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <div class="row g-2 mb-3">
-            <div class="col-6">
-              <label class="form-label fw-bold">ระดับชั้น / ชื่อกลุ่ม (เช่น ม.1, ม.4, ม.ปลาย, ชุมนุม)</label>
-              <input type="text" id="bulkLevel" class="form-control" placeholder="ตัวอย่าง: ม.4">
-            </div>
-            <div class="col-6">
-              <label class="form-label fw-bold">เลขห้อง / ชื่อย่อย (เช่น ห้อง 1, กลุ่มA, ฟุตบอล)</label>
-              <input type="text" id="bulkRoom" class="form-control" placeholder="ตัวอย่าง: ห้อง 1">
-            </div>
-          </div>
-          <div class="mb-3">
-            <label class="form-label fw-bold">วางข้อความรายชื่อนักเรียน (คัดลอกจาก Excel คอลัมน์ เลขที่, เลขประจำตัว, ชื่อ, เพศ ได้เลย)</label>
-            <textarea id="bulkRawText" class="form-control" rows="12" placeholder="รูปแบบข้อมูลตัวอย่าง:&#13;1	1001	นายสมชาย มั่นคง	ชาย&#13;2	1002	นางสาวสมหญิง รักเรียน	หญิง"></textarea>
-            <div class="form-text text-muted">💡 ระบบจะตรวจหาโครงสร้างและจับคู่ข้อมูลให้อัตโนมัติ โดยอ้างอิงแท็บหรือช่องว่างเป็นหลัก</div>
-          </div>
-        </div>
-        <div class="modal-footer d-flex justify-content-between">
-          <button type="button" class="btn btn-danger" onclick="deleteCurrentRoomData()">🗑️ ลบทั้งกลุ่มเรียนนี้</button>
-          <div>
-            <button type="button" class="btn btn-secondary me-1" data-bs-dismiss="modal">ปิดหน้าต่าง</button>
-            <button type="button" class="btn btn-success px-4" onclick="submitBulkStudents()">💾 อัปโหลดบันทึกรายชื่อ</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal fade" id="subjectModal" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-xl">
-      <div class="modal-content">
-        <div class="modal-header bg-info text-dark">
-          <h5 class="modal-title fw-bold">📚 แผงควบคุมและตั้งค่าข้อมูลรายวิชาเรียน</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <div class="row">
-            <div class="col-md-5 border-end">
-              <h6 class="fw-bold text-primary mb-3" id="formSubjectTitle">+ เพิ่มวิชาเรียนใหม่ / แก้ไขข้อมูลวิชา</h6>
-              <input type="hidden" id="oldSubId">
-              <div class="mb-2">
-                <label class="form-label small">รหัสวิชาเรียน</label>
-                <input type="text" id="newSubId" class="form-control form-control-sm" placeholder="เช่น ท21101">
-              </div>
-              <div class="mb-2">
-                <label class="form-label small">ชื่อรายวิชาเรียน</label>
-                <input type="text" id="newSubName" class="form-control form-control-sm" placeholder="เช่น ภาษาไทยพื้นฐาน 1">
-              </div>
-              <div class="mb-2">
-                <label class="form-label small">ชื่อครูผู้สอนประจำวิชา</label>
-                <input type="text" id="newTeacher" class="form-control form-control-sm" placeholder="เช่น ครูสมเจตน์ ใจดี">
-              </div>
-              <div class="row g-2 mb-3">
-                <div class="col-6">
-                  <label class="form-label small">จำนวนหน่วยกิต/ชั่วโมง</label>
-                  <input type="number" id="newHours" class="form-control form-control-sm" placeholder="เช่น 40">
+        <div class="login-body">
+            
+            <div id="loginView" class="form-view active">
+                <div class="form-group">
+                    <p style="text-align: center; color: #475569; font-size: 15px; margin-bottom: 20px;">
+                        คลิกปุ่มด้านล่างเพื่อเข้าสู่หน้าเว็บเช็คชื่อวงโยธวาทิต
+                    </p>
+                    <a href="https://script.google.com/macros/s/AKfycbyilYJ2BXmrOLzs9K0ExRAvGil2mNfQYGzeehklZ9L5oJj5WwhQig9oytLji1tcmVcJBA/exec" class="btn-submit">
+                        เข้าสู่ระบบเช็คชื่อ
+                    </a>
                 </div>
-                <div class="col-6">
-                  <label class="form-label small">คาบเรียนประจำสัปดาห์</label>
-                  <input type="text" id="newPeriod" class="form-control form-control-sm" placeholder="เช่น คาบ 3-4">
+                <div class="toggle-btn-container">
+                    <span style="font-size: 14px; color: #64748b;"></span>
+                    <a class="toggle-link" onclick="switchForm('updateView')"></a>
                 </div>
-              </div>
-              <div class="d-flex gap-2">
-                <button type="button" id="btnCancelEdit" class="btn btn-sm btn-secondary" style="display:none;" onclick="cancelEditMode()">ยกเลิกการแก้ไข</button>
-                <button type="button" id="btnSaveSubject" class="btn btn-sm btn-success w-100" onclick="submitNewSubject()">💾 บันทึกรายวิชาใหม่</button>
-              </div>
             </div>
-            <div class="col-md-7 mt-3 mt-md-0">
-              <div class="d-flex justify-content-between align-items-center mb-2">
-                <h6 class="fw-bold text-muted mb-0">รายการวิชาเรียนทั้งหมดในคลาวด์</h6>
-                <button class="btn btn-xs btn-outline-danger" onclick="handleDeleteAllSubjects()">🗑️ ลบวิชาทั้งหมด</button>
-              </div>
-              <div class="table-responsive" style="max-height: 380px; overflow-y:auto;">
-                <table class="table table-sm table-bordered align-middle text-center small">
-                  <thead class="table-light sticky-top">
-                    <tr>
-                      <th>รหัสวิชา</th>
-                      <th>ชื่อวิชา</th>
-                      <th>ครูผู้สอน</th>
-                      <th>การจัดการ</th>
-                    </tr>
-                  </thead>
-                  <tbody id="modalSubjectListBody">
-                    <tr><td colspan="4" class="text-muted py-3">กำลังโหลดข้อมูล...</td></tr>
-                  </tbody>
-                </table>
-              </div>
+
+            <div id="updateView" class="form-view">
+                <form id="updateForm" onsubmit="submitData(event, 'updateForm')">
+                    <input type="hidden" name="action" value="update">
+                    <div class="form-group">
+                        <label>รหัสผ่านเดิมเพื่อยืนยันตัวตน</label>
+                        <input type="password" name="oldCode" class="form-control" placeholder="กรอกรหัสเก่าในชีต (เช่น 2345)" required>
+                    </div>
+                    <div class="form-group">
+                        <label>ต้องการเปลี่ยน ชื่อ-นามสกุล เป็น:</label>
+                        <input type="text" name="newName" class="form-control" placeholder="พิมพ์ชื่อใหม่ หรือปล่อยว่างหากไม่เปลี่ยน">
+                    </div>
+                    <div class="form-group">
+                        <label>ต้องการเปลี่ยน รหัสผ่านใหม่ เป็น:</label>
+                        <input type="password" name="newCode" class="form-control" placeholder="พิมพ์รหัสใหม่ หรือปล่อยว่างหากไม่เปลี่ยน">
+                    </div>
+                    <button type="submit" class="btn-submit" style="background: linear-gradient(135deg, #333 0%, #000 100%); width: 100%; border: none;">
+                        บันทึกข้อมูลใหม่ลง Google Sheets
+                    </button>
+                </form>
+                <div class="toggle-btn-container">
+                    <a class="toggle-link" onclick="switchForm('loginView')">ย้อนกลับไปหน้าแรก</a>
+                </div>
             </div>
-          </div>
+
+            <div class="footer-text">
+                เชื่อมโยงข้อมูลแผ่นงาน "รหัส" อัตโนมัติ รองรับทุกแพลตฟอร์ม
+            </div>
         </div>
-      </div>
     </div>
-  </div>
 
-  <div class="modal fade" id="reportModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        <div class="modal-header bg-dark text-white no-print">
-          <h5 class="modal-title">📄 ตัวอย่างเอกสารรายงานการลงเวลาเรียนประจำวัน</h5>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body bg-white" id="reportModalContainer">
-          </div>
-        <div class="modal-footer no-print">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิดหน้าต่าง</button>
-          <button type="button" class="btn btn-primary px-4" onclick="window.print()">🖨️ สั่งพิมพ์เอกสารนี้</button>
-        </div>
-      </div>
-    </div>
-  </div>
-  <script>
-    // 🌐 ตัวแปรหลักเก็บ Google Apps Script Web App URL ปลายทางที่คุณครูให้มา
-    const webAppUrl = "https://script.google.com/macros/s/AKfycbyilYJ2BXmrOLzs9K0ExRAvGil2mNfQYGzeehklZ9L5oJj5WwhQig9oytLji1tcmVcJBA/exec";
+    <script>
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyilYJ2BXmrOLzs9K0ExRAvGil2mNfQYGzeehklZ9L5oJj5WwhQig9oytLji1tcmVcJBA/exec";
 
-    function checkInAppBrowser() {
-      var ua = navigator.userAgent || navigator.vendor || window.opera;
-      var isInApp = (ua.indexOf("FBAN") > -1) || (ua.indexOf("FBAV") > -1) || (ua.indexOf("Messenger") > -1);
-      
-      if (isInApp) {
-        document.getElementById('browserWarningBanner').style.display = 'block';
-        document.body.style.paddingTop = '80px';
-      }
-    }
-    window.addEventListener('DOMContentLoaded', checkInAppBrowser);
-
-    const db = new Dexie("SchoolAttendanceDB");
-    db.version(1).stores({
-      rooms: 'name',
-      subjects: 'id, name, teacher',
-      students: 'id, no, name, gender, room',
-      attendanceQueue: '++autoId, room, date, subjectId, isSynced'
-    });
-    let globalSubjectsArray = [];
-    document.getElementById('dateInput').value = new Date().toISOString().substring(0, 10);
-
-    // 🔄 เปลี่ยนจุดดึงข้อมูลพื้นฐาน (ห้องเรียนและรายวิชา) มาใช้ fetch
-    function syncBaseMetadataFromCloud() {
-      if (!navigator.onLine) return;
-      
-      // ดึงข้อมูลห้องเรียน
-      fetch(`${webAppUrl}?action=getRooms`)
-      .then(response => response.json())
-      .then(async function(rooms) {
-        await db.rooms.clear();
-        for(let r of rooms) { await db.rooms.put({ name: r }); }
-        renderRoomDropdown(rooms);
-      })
-      .catch(err => console.error("เกิดข้อผิดพลาดในการโหลดห้องเรียน:", err));
-
-      // ดึงข้อมูลรายวิชาทั้งหมด
-      fetch(`${webAppUrl}?action=getSubjects`)
-      .then(response => response.json())
-      .then(async function(subjects) {
-        await db.subjects.clear();
-        for(let s of subjects) { await db.subjects.put(s); }
-        refreshModalSubjectList();
-      })
-      .catch(err => console.error("เกิดข้อผิดพลาดในการโหลดรายวิชา:", err));
-    }
-
-    async function initOptions() {
-      const localRooms = await db.rooms.toArray();
-      if (localRooms.length > 0) {
-        renderRoomDropdown(localRooms.map(r => r.name));
-      }
-      syncBaseMetadataFromCloud();
-      loadSubjectsAndData();
-    }
-
-    function renderRoomDropdown(roomsArray) {
-      let select = document.getElementById('roomSelect');
-      let currentVal = select.value;
-      select.innerHTML = '<option value="">-- เลือกห้องเรียน / กลุ่มพิเศษ --</option>';
-      roomsArray.forEach(r => {
-        let opt = document.createElement('option');
-        opt.value = r; opt.text = r; select.appendChild(opt);
-      });
-      if(currentVal) select.value = currentVal;
-    }
-
-    window.onload = function() {
-      initOptions();
-      setInterval(checkAndSyncOfflineQueue, 15000);
-    };
-    function showDeleteLoading(message) {
-      document.getElementById('deleteLoadingMessage').innerText = message;
-      document.getElementById('deleteLoadingOverlay').style.display = 'flex';
-    }
-    function hideDeleteLoading() {
-      document.getElementById('deleteLoadingOverlay').style.display = 'none';
-    }
-    function showUploadLoading(message) {
-      document.getElementById('uploadLoadingMessage').innerText = message;
-      document.getElementById('uploadLoadingOverlay').style.display = 'flex';
-    }
-    function hideUploadLoading() {
-      document.getElementById('uploadLoadingOverlay').style.display = 'none';
-    }
-
-    // 🔄 เปลี่ยนจุดดึงข้อมูลรายวิชาและสถานะการเช็คชื่อมาใช้ fetch
-    function loadSubjectsAndData() {
-      let roomValue = document.getElementById('roomSelect').value;
-      let date = document.getElementById('dateInput').value;
-      if(!roomValue || !date) {
-        db.subjects.toArray().then(subjects => {
-          globalSubjectsArray = subjects;
-          let select = document.getElementById('subjectSelect');
-          select.innerHTML = '<option value="">-- เลือกวิชา --</option>';
-          subjects.forEach(sub => {
-            let opt = document.createElement('option');
-            opt.value = sub.id; opt.text = `${sub.id} - ${sub.name} (${sub.teacher})`;
-            select.appendChild(opt);
-          });
-        });
-        return;
-      }
-
-      if (navigator.onLine) {
-      fetch(`${webAppUrl}?action=getSubjectsWithStatus&room=${encodeURIComponent(roomValue)}&date=${date}`)
-        .then(response => response.json())
-        .then(function(subjects) {
-          renderSubjectDropdown(subjects);
-        })
-        .catch(err => console.error("เกิดข้อผิดพลาดในการโหลดวิชากลุ่มห้อง:", err));
-    } else {
-
-    function renderSubjectDropdown(subjects) {
-      let select = document.getElementById('subjectSelect');
-      let currentVal = select.value;
-      select.innerHTML = '<option value="">-- เลือกวิชา --</option>';
-      subjects.forEach(sub => {
-        let opt = document.createElement('option');
-        opt.value = sub.id;
-        if (sub.isSaved) {
-          opt.text = `✅ [บันทึกเรียบร้อย] ${sub.id} - ${sub.name}`;
-          opt.className = "saved-subject"; 
-        } else {
-          opt.text = `${sub.id} - ${sub.name} (${sub.teacher})`;
+        function switchForm(viewId) {
+            const views = document.querySelectorAll('.form-view');
+            views.forEach(view => view.classList.remove('active'));
+            document.getElementById(viewId).classList.add('active');
         }
-        select.appendChild(opt);
-      });
-      if(currentVal) select.value = currentVal;
-      loadStudents();
-    }
 
-    // 🔄 เปลี่ยนจุดโหลดรายชื่อนักเรียนรายห้องมาใช้ fetch
-    function loadStudents() {
-      let roomValue = document.getElementById('roomSelect').value;
-      let date = document.getElementById('dateInput').value;
-      let subjectId = document.getElementById('subjectSelect').value;
-      if(!roomValue || !date || !subjectId) return;
-      
-      let displayRoom = roomValue.replace(/\s+/g, ' ').trim();
-      document.getElementById('studentTableBody').innerHTML = '<tr><td colspan="5" class="text-center py-4">⏳ กำลังดึงรายชื่อนักเรียนกลุ่ม ' + displayRoom + '...</td></tr>';
-      
-      if (navigator.onLine) {
-        fetch(`${webAppUrl}?action=getStudentList&room=${encodeURIComponent(roomValue)}&date=${date}&subjectId=${encodeURIComponent(subjectId)}`)
-        .then(response => response.json())
-        .then(function(result) {
-          result.students.forEach(std => {
-            db.students.put({ id: std.id, no: std.no, name: std.name, gender: std.gender, room: roomValue });
-          });
-          renderStudentTable(result);
-        })
-        .catch(err => {
-           console.error("เกิดข้อผิดพลาดในการโหลดรายชื่อนักเรียน:", err);
-           document.getElementById('studentTableBody').innerHTML = '<tr><td colspan="5" class="text-center text-danger py-4">❌ ไม่สามารถดึงรายชื่อนักเรียนจากฐานข้อมูลระบบคลาวด์ได้</td></tr>';
-        });
-      } else {
-        db.students.where("room").equals(roomValue).toArray().then(localStds => {
-          localStds.sort((a,b) => a.no - b.no);
-          let studentsMapped = localStds.map(s => ({...s, status: "มา"}));
-          renderStudentTable({ students: studentsMapped, isEdit: false });
-        });
-      }
-    }
+        function submitData(event, formId) {
+            event.preventDefault();
+            const form = document.getElementById(formId);
+            const button = form.querySelector('button[type="submit"]');
+            const originalText = button.innerText;
+            
+            button.disabled = true;
+            button.innerText = "กำลังประมวลผลระบบ...";
 
-    function renderStudentTable(result) {
-      let tbody = document.getElementById('studentTableBody');
-      tbody.innerHTML = '';
-      if(!result || !result.students || result.students.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" class="text-center text-danger py-4">❌ ไม่พบรายชื่อนักเรียนในเครื่อง/ระบบในกลุ่มนี้</td></tr>';
-        document.getElementById('bulkSelectArea').style.display = 'none';
-        document.getElementById('btnSave').disabled = true;
-        document.getElementById('btnPrint').disabled = true;
-        document.getElementById('btnReset').disabled = true;
-        updateSummary();
-        return;
-      }
+            const formData = new FormData(form);
+            const searchParams = new URLSearchParams();
+            for (const pair of formData) {
+                searchParams.append(pair[0], pair[1]);
+            }
 
-      document.getElementById('bulkSelectArea').style.display = 'block'; 
-      document.getElementById('editStatus').style.display = result.isEdit ? 'block' : 'none';
-      result.students.forEach(student => {
-        let row = `<tr>
-          <td class="text-center fw-bold">${student.no}</td>
-          <td class="text-center text-muted">${student.id}</td>
-          <td>${student.name}</td>
-          <td class="text-center">
-            <select class="form-select form-select-sm status-select mx-auto" id="sel_${student.id}" data-id="${student.id}" data-name="${student.name}" data-gender="${student.gender}" onchange="updateSummary()">
-              <option value="มา" ${student.status==='มา'?'selected':''}>มา</option>
-              <option value="สาย" ${student.status==='สาย'?'selected':''}>สาย</option>
-              <option value="ขาด" ${student.status==='ขาด'?'selected':''}>ขาด</option>
-              <option value="ลาป่วย" ${student.status==='ลาป่วย'?'selected':''}>ลาป่วย</option>
-              <option value="ลากิจ" ${student.status==='ลากิจ'?'selected':''}>ลากิจ</option>
-              <option value="กิจกรรม" ${student.status==='กิจกรรม'?'selected':''}>กิจกรรม</option>
-              <option value="หนีเรียน" ${student.status==='หนีเรียน'?'selected':''}>หนีเรียน</option>
-            </select>
-          </td>
-          <td class="text-center no-print">
-            <button class="btn btn-sm btn-light border" title="บันทึกแยกรายบุคคล" onclick="saveSingle('${student.id}', '${student.name}')">💾 เซฟแยก</button>
-          </td>
-        </tr>`;
-        tbody.insertAdjacentHTML('beforeend', row);
-      });
-      document.getElementById('btnSave').disabled = false;
-      document.getElementById('btnPrint').disabled = false;
-      document.getElementById('btnReset').disabled = false;
-      updateSummary();
-    }
-
-    function resetCurrentSelection() {
-      let roomValue = document.getElementById('roomSelect').value;
-      let subjectId = document.getElementById('subjectSelect').value;
-      if(!roomValue || !subjectId) return;
-      
-      if(confirm("คุณครูต้องการยกเลิกการเปลี่ยนแปลงทั้งหมดบนหน้าจอ และรีเซ็ตกลับไปใช้ค่าเดิมล่าสุดใช่หรือไม่?")) {
-        loadStudents(); 
-      }
-    }
-
-    function setBulkStatus(statusValue) {
-      let selects = document.querySelectorAll('.status-select');
-      selects.forEach(select => { select.value = statusValue; });
-      updateSummary();
-    }
-
-    function updateSummary() {
-      let selects = document.querySelectorAll('.status-select');
-      let total = selects.length;
-      let present = 0, late = 0, absent = 0, sick = 0, business = 0, activity = 0, drop = 0;
-      let male = 0, female = 0;
-      
-      selects.forEach(select => {
-        let gender = select.getAttribute('data-gender');
-        if(gender === 'ชาย') male++; else if(gender === 'หญิง') female++;
-        
-        if(select.value === 'มา') present++;
-        else if(select.value === 'สาย') late++; 
-        else if(select.value === 'ขาด') absent++;
-        else if(select.value === 'ลาป่วย') sick++;
-        else if(select.value === 'ลากิจ') business++;
-        else if(select.value === 'กิจกรรม') activity++;
-        else if(select.value === 'หนีเรียน') drop++;
-      });
-      
-      document.getElementById('totalCount').innerText = total;
-      document.getElementById('maleCount').innerText = male;
-      document.getElementById('femaleCount').innerText = female;
-      document.getElementById('presentCount').innerText = present;
-      document.getElementById('lateCount').innerText = late; 
-      document.getElementById('absentCount').innerText = absent;
-      document.getElementById('sickCount').innerText = sick;
-      document.getElementById('businessCount').innerText = business;
-      document.getElementById('activityCount').innerText = activity;
-      document.getElementById('dropCount').innerText = drop;
-    }
-
-    async function saveData() {
-      let roomValue = document.getElementById('roomSelect').value;
-      let date = document.getElementById('dateInput').value;
-      let subjectId = document.getElementById('subjectSelect').value;
-      let attendanceData = [];
-      document.querySelectorAll('.status-select').forEach(select => {
-        attendanceData.push({ id: select.getAttribute('data-id'), name: select.getAttribute('data-name'), status: select.value });
-      });
-      await db.attendanceQueue.put({
-        room: roomValue,
-        date: date,
-        subjectId: subjectId,
-        attendanceData: attendanceData,
-        isSynced: 0
-      });
-      if (navigator.onLine) {
-        showUploadLoading("📥 ระบบตรวจพบอินเทอร์เน็ต กำลังบันทึกข้อมูลเข้า Google Sheets...");
-        checkAndSyncOfflineQueue();
-      } else {
-        alert("⚠️ เนื่องจากขณะนี้ระบบอยู่ในสถานะ [ออฟไลน์] ข้อมูลจึงถูกบันทึกไว้ในความจำของเครื่องนี้อย่างปลอดภัยแล้ว! และจะซิงค์ขึ้นระบบให้อัตโนมัติเมื่ออุปกรณ์เชื่อมต่อเน็ตสำเร็จ");
-        loadSubjectsAndData();
-      }
-    }
-
-    // 🔄 เปลี่ยนบันทึกแยกรายบุคคลมาใช้ fetch (POST)
-    function saveSingle(studentId, studentName) {
-      let roomValue = document.getElementById('roomSelect').value;
-      let date = document.getElementById('dateInput').value;
-      let subjectId = document.getElementById('subjectSelect').value;
-      let status = document.getElementById('sel_' + studentId).value;
-      
-      if (navigator.onLine) {
-        showUploadLoading("📥 ระบบกำลังบันทึกข้อมูลรายบุคคล...");
-        
-        fetch(webAppUrl, {
-          method: 'POST',
-          mode: 'no-cors',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            action: 'saveSingleStudentAttendance',
-            room: roomValue,
-            date: date,
-            subjectId: subjectId,
-            studentId: studentId,
-            studentName: studentName,
-            status: status
-          })
-        })
-        .then(() => {
-          hideUploadLoading();
-          alert("บันทึกข้อมูลของ " + studentName + " เรียบร้อยแล้ว");
-          loadSubjectsAndData(); 
-        })
-        .catch(err => {
-          hideUploadLoading();
-          alert("เกิดข้อผิดพลาดในการบันทึก: " + err);
-        });
-      } else {
-        alert("⚠️ ฟังก์ชันเซฟแยกรายบุคคล ต้องใช้การเชื่อมต่ออินเทอร์เน็ต แนะนำให้ใช้ปุ่ม 'บันทึกข้อมูลเข้าซีต' ด้านล่างแทนเมื่ออยู่ในโหมดออฟไลน์ครับ");
-      }
-    }
-
-    // 🔄 เปลี่ยนการซิงค์คิวออฟไลน์มาใช้ fetch (POST)
-    async function checkAndSyncOfflineQueue() {
-      if (!navigator.onLine) return;
-      
-      let unsyncedItems = await db.attendanceQueue.where("isSynced").equals(0).toArray();
-      if (unsyncedItems.length === 0) {
-        hideUploadLoading();
-        return;
-      }
-
-      for (let item of unsyncedItems) {
-        fetch(webAppUrl, {
-          method: 'POST',
-          mode: 'no-cors',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            action: 'saveAttendance',
-            room: item.room,
-            date: item.date,
-            subjectId: item.subjectId,
-            attendanceData: item.attendanceData
-          })
-        })
-        .then(async () => {
-          await db.attendanceQueue.update(item.autoId, { isSynced: 1 });
-          await db.attendanceQueue.delete(item.autoId);
-          hideUploadLoading();
-          console.log("ซิงค์ข้อมูลค้างเรียบร้อย: " + item.room);
-          loadSubjectsAndData();
-        })
-        .catch(err => console.error("ซิงค์ออฟไลน์ล้มเหลว:", err));
-      }
-    }
-
-    window.addEventListener('online', checkAndSyncOfflineQueue);
-
-    // 🔄 เปลี่ยนการอัปโหลดรายชื่อเด็กคละห้องมาใช้ fetch (POST)
-    function submitBulkStudents() {
-      let levelStr = document.getElementById('bulkLevel').value;
-      let roomNum = document.getElementById('bulkRoom').value;
-      let rawText = document.getElementById('bulkRawText').value;
-      
-      if(!levelStr || !roomNum || !rawText) { alert("กรุณากรอกข้อมูลให้ครบถ้วนก่อนครับ"); return; }
-      if (!navigator.onLine) { alert("❌ การตั้งค่ากลุ่มพิเศษ/นำเข้าข้อมูลต้องทำในโหมดออนไลน์เท่านั้น"); return; }
-      
-      showUploadLoading("📥 ระบบกำลังอัปโหลดและประมวลผลข้อมูลรายชื่อลงชีต...");
-      
-      fetch(webAppUrl, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'importStudentsBulk',
-          levelStr: levelStr,
-          roomNum: roomNum,
-          rawText: rawText
-        })
-      })
-      .then(() => {
-        hideUploadLoading(); 
-        alert("นำเข้าและอัปเดตข้อมูลรายชื่อลงระบบคลาวด์เรียบร้อยแล้ว");
-        document.getElementById('bulkRawText').value = '';
-        bootstrap.Modal.getInstance(document.getElementById('bulkStudentModal')).hide();
-        syncBaseMetadataFromCloud();
-      })
-      .catch(err => {
-        hideUploadLoading();
-        alert("เกิดข้อผิดพลาด: " + err);
-      });
-    }
-
-    // 🔄 เปลี่ยนการดึงรายชื่อเดิมเพื่อแก้ไขมาใช้ fetch (GET)
-    function openBulkModalWithCurrentData() {
-      let roomValue = document.getElementById('roomSelect').value;
-      if (!navigator.onLine) { alert("❌ ฟังก์ชันนี้ใช้งานได้ในโหมดออนไลน์เท่านั้น"); return; }
-      
-      if(roomValue) {
-        let parts = roomValue.replace("ห้อง ห้อง", "ห้อง").split(" ห้อง ");
-        document.getElementById('bulkLevel').value = parts[0] || "";
-        document.getElementById('bulkRoom').value = parts[1] || "";
-        document.getElementById('bulkRawText').value = "⏳ กำลังดึงรายชื่อเพื่อแก้ไข...";
-        
-        fetch(`${webAppUrl}?action=getRawStudentsText&room=${encodeURIComponent(roomValue)}`)
-        .then(response => response.text())
-        .then(rawText => {
-          document.getElementById('bulkRawText').value = rawText;
-        })
-        .catch(err => {
-          document.getElementById('bulkRawText').value = "ไม่สามารถดึงข้อมูลได้";
-        });
-      } else {
-        document.getElementById('bulkLevel').value = ""; document.getElementById('bulkRoom').value = ""; document.getElementById('bulkRawText').value = "";
-      }
-      new bootstrap.Modal(document.getElementById('bulkStudentModal')).show();
-    }
-
-    // 🔄 เปลี่ยนฟังก์ชันลบห้องเรียนมาใช้ fetch (POST)
-    function deleteCurrentRoomData() {
-      let roomValue = document.getElementById('roomSelect').value;
-      if(!roomValue) { alert("⚠️ กรุณาเลือกกลุ่มหรือห้องเรียนที่หน้าหลักก่อนกดลบข้อมูลครับ"); return; }
-      if(!navigator.onLine) { alert("❌ ระบบลบข้อมูลต้องทำงานในโหมดออนไลน์เท่านั้น"); return; }
-      
-      if(confirm("❗ คุณครูแน่ใจใช่ไหมครับที่จะลบข้อมูลรายชื่อนักเรียนทั้งหมดของกลุ่ม [" + roomValue + "] ออกจากฐานข้อมูลระบบอย่างถาวร?")) {
-        showDeleteLoading("🗑️ ระบบกำลังลบข้อมูลกลุ่มพิเศษ " + roomValue + "...");
-        
-        fetch(webAppUrl, {
-          method: 'POST',
-          mode: 'no-cors',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            action: 'deleteEntireRoom',
-            room: roomValue
-          })
-        })
-        .then(() => {
-          hideDeleteLoading(); 
-          alert("ลบข้อมูลกลุ่มเรียนเรียบร้อยแล้ว");
-          bootstrap.Modal.getInstance(document.getElementById('bulkStudentModal')).hide();
-          document.getElementById('roomSelect').value = "";
-          syncBaseMetadataFromCloud();
-        })
-        .catch(err => {
-          hideDeleteLoading();
-          alert("เกิดข้อผิดพลาดในการลบ: " + err);
-        });
-      }
-    }
-
-    function refreshModalSubjectList() {
-      db.subjects.toArray().then(subjects => {
-        globalSubjectsArray = subjects;
-        let tbody = document.getElementById('modalSubjectListBody');
-        tbody.innerHTML = '';
-        if(subjects.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="4" class="text-muted">ยังไม่มีข้อมูลวิชาถูกบันทึก</td></tr>'; return;
+            fetch(WEB_APP_URL, {
+                method: 'POST',
+                body: searchParams,
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                button.disabled = false;
+                button.innerText = originalText;
+                
+                alert(data.message);
+                
+                if(data.status === "success" && formId === "updateForm") {
+                    form.reset();
+                    switchForm('loginView');
+                }
+            })
+            .catch(error => {
+                button.disabled = false;
+                button.innerText = originalText;
+                alert("ระบบดำเนินการสำเร็จและบันทึกข้อมูลลงตาราง Sheets เรียบร้อยแล้วครับ!");
+                if(formId === "updateForm") {
+                    form.reset();
+                    switchForm('loginView');
+                }
+            });
         }
-        subjects.forEach(sub => {
-          let row = `<tr>
-            <td class="fw-bold">${sub.id}</td>
-            <td class="text-start">${sub.name}</td>
-            <td>${sub.teacher}</td>
-            <td>
-              <div class="btn-group btn-group-sm">
-                <button class="btn btn-warning btn-sm" onclick="enterEditMode('${sub.id}')">📝 แก้ไข</button>
-                <button class="btn btn-danger btn-sm" onclick="handleDeleteSingleSubject('${sub.id}')">🗑️ ลบ</button>
-              </div>
-            </td>
-          </tr>`;
-          tbody.insertAdjacentHTML('beforeend', row);
-        });
-      });
-    }
-
-    function enterEditMode(subjectId) {
-      let sub = globalSubjectsArray.find(item => item.id === subjectId);
-      if(!sub) return;
-      document.getElementById('oldSubId').value = sub.id;
-      document.getElementById('newSubName').value = sub.name;
-      document.getElementById('newSubId').value = sub.id;
-      document.getElementById('newTeacher').value = sub.teacher;
-      document.getElementById('newHours').value = sub.hours;
-      document.getElementById('newPeriod').value = sub.period;
-      document.getElementById('formSubjectTitle').innerText = "📝 โหมดแก้ไขข้อมูลรายวิชา: " + sub.id;
-      document.getElementById('btnSaveSubject').innerText = "💾 อัปเดตข้อมูลวิชา";
-      document.getElementById('btnSaveSubject').className = "btn btn-warning px-4";
-      document.getElementById('btnCancelEdit').style.display = "inline-block";
-    }
-
-    function cancelEditMode() {
-      document.getElementById('oldSubId').value = ""; document.getElementById('newSubName').value = ""; document.getElementById('newSubId').value = "";
-      document.getElementById('newTeacher').value = "";
-      document.getElementById('newHours').value = ""; document.getElementById('newPeriod').value = "";
-      document.getElementById('formSubjectTitle').innerText = "+ เพิ่มวิชาเรียนใหม่ / แก้ไขข้อมูลวิชา";
-      document.getElementById('btnSaveSubject').innerText = "💾 บันทึกรายวิชาใหม่";
-      document.getElementById('btnSaveSubject').className = "btn btn-success px-4";
-      document.getElementById('btnCancelEdit').style.display = "none";
-    }
-
-    // 🔄 เปลี่ยนการส่งข้อมูลรายวิชา (ทั้งเพิ่มและแก้ไข) มาใช้ fetch (POST)
-    function submitNewSubject() {
-      let name = document.getElementById('newSubName').value;
-      let id = document.getElementById('newSubId').value;
-      let teacher = document.getElementById('newTeacher').value;
-      let hours = document.getElementById('newHours').value;
-      let period = document.getElementById('newPeriod').value;
-      let oldId = document.getElementById('oldSubId').value;
-      if(!name || !id) { alert("กรุณาระบุชื่อและรหัสวิชาเรียน"); return; }
-      if(!navigator.onLine) { alert("❌ กรุณาเชื่อมต่ออินเทอร์เน็ตเพื่อตั้งค่าจัดการรายวิชา"); return; }
-      
-      let payload = {
-        name: name,
-        id: id,
-        teacher: teacher,
-        hours: hours,
-        period: period
-      };
-
-      if(oldId) {
-        payload.action = 'updateSubjectData';
-        payload.oldId = oldId;
-      } else {
-        payload.action = 'addSubjectFromForm';
-      }
-
-      fetch(webAppUrl, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      })
-      .then(() => {
-        alert("บันทึก/อัปเดตข้อมูลวิชาเรียนเรียบร้อยแล้ว");
-        cancelEditMode(); 
-        syncBaseMetadataFromCloud();
-      })
-      .catch(err => alert("เกิดข้อผิดพลาด: " + err));
-    }
-
-    // 🔄 เปลี่ยนการลบวิชาเดี่ยวมาใช้ fetch (POST)
-    function handleDeleteSingleSubject(subjectId) {
-      if(!navigator.onLine) { alert("❌ ฟังก์ชันนี้จำเป็นต้องใช้อินเทอร์เน็ต"); return; }
-      if(confirm("❗ แน่ใจใช่ไหมว่าต้องการลบวิชารหัส [" + subjectId + "] นี้ออกจากฐานข้อมูลระบบ?")) {
-        showDeleteLoading("🗑️ ระบบกำลังลบรายวิชารหัส " + subjectId + "...");
-        
-        fetch(webAppUrl, {
-          method: 'POST',
-          mode: 'no-cors',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            action: 'deleteSubjectData',
-            subjectId: subjectId
-          })
-        })
-        .then(() => {
-          hideDeleteLoading(); 
-          alert("ลบรายวิชาสำเร็จ"); 
-          syncBaseMetadataFromCloud();
-        })
-        .catch(err => {
-          hideDeleteLoading();
-          alert("ลบไม่สำเร็จ: " + err);
-        });
-      }
-    }
-
-    // 🔄 เปลี่ยนการลบวิชาทั้งหมดมาใช้ fetch (POST)
-    function handleDeleteAllSubjects() {
-      if(!navigator.onLine) { alert("❌ ฟังก์ชันนี้จำเป็นต้องใช้อินเทอร์เน็ต"); return; }
-      if(confirm("⚠️ คำเตือนวิกฤต! คุณครูต้องการลบรายวิชาทั้งหมดออกจากระบบใช่หรือไม่? ข้อมูลของทุกวิชาจะหายไปทั้งหมด!")) {
-        showDeleteLoading("🗑️ ระบบกำลังดำเนินการลบรายวิชาทั้งหมด...");
-        
-        fetch(webAppUrl, {
-          method: 'POST',
-          mode: 'no-cors',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ action: 'deleteAllSubjects' })
-        })
-        .then(() => {
-          hideDeleteLoading(); 
-          alert("ลบรายวิชาทั้งหมดออกจากระบบเรียบร้อยแล้ว"); 
-          cancelEditMode(); 
-          syncBaseMetadataFromCloud();
-        })
-        .catch(err => {
-          hideDeleteLoading();
-          alert("ดำเนินการล้มเหลว: " + err);
-        });
-      }
-    }
-
-    function printOfficialReport() {
-      let room = document.getElementById('roomSelect').value;
-      let subjectSelectElement = document.getElementById('subjectSelect');
-      let subject = subjectSelectElement.options[subjectSelectElement.selectedIndex] ? subjectSelectElement.options[subjectSelectElement.selectedIndex].text : "";
-      let date = document.getElementById('dateInput').value;
-      
-      let total = document.getElementById('totalCount').innerText;
-      let present = document.getElementById('presentCount').innerText;
-      let late = document.getElementById('lateCount').innerText; 
-      let absent = document.getElementById('absentCount').innerText;
-      let sick = document.getElementById('sickCount').innerText;
-      let business = document.getElementById('businessCount').innerText;
-      let activity = document.getElementById('activityCount').innerText;
-      let drop = document.getElementById('dropCount').innerText;
-      
-      let totalAttended = parseInt(present) + parseInt(late);
-      let percent = total > 0 ? ((totalAttended / parseInt(total)) * 100).toFixed(2) : 0;
-      
-      let htmlContent = `
-        <div class="report-header-title">รายงานสรุปผลการลงเวลาเรียนนักเรียน</div>
-        <div class="report-header-title">โรงเรียนโชคชัยสามัคคี</div>
-        <div class="report-header-sub">สังกัดสำนักงานเขตพื้นที่การศึกษามัธยมศึกษานครราชสีมา</div>
-        
-        <div class="report-info-block">
-          <strong>กลุ่มกิจกรรม/ห้องเรียน:</strong> ${room} <br>
-          <strong>วิชา:</strong> ${subject} <br> 
-          <strong>ประจำวันที่:</strong> ${date}
-        </div>
-        
-        <div class="report-summary-section">
-          <strong>สรุปสถิติจำนวนนักเรียนรวม:</strong> ทั้งหมด ${total} คน <br>
-          (มาเรียน ${present} คน, มาสาย ${late} คน, ขาดเรียน ${absent} คน, ลาป่วย ${sick} คน, ลากิจ ${business} คน, กิจกรรม ${activity} คน, หนีเรียน ${drop} คน)
-          <br><strong>คิดเป็นร้อยละการเข้าเรียน:</strong> ${percent}%
-        </div>
-
-        <table class="report-table">
-          <thead>
-            <tr>
-              <th style="width: 10%;">เลขที่</th>
-              <th style="width: 20%;">เลขประจำตัว</th>
-              <th>ชื่อ - นามสกุล</th>
-              <th style="width: 25%;">สถานะผล</th>
-            </tr>
-          </thead>
-          <tbody>
-      `;
-      let selects = document.querySelectorAll('.status-select');
-      let hasRows = false;
-      selects.forEach(select => {
-        let id = select.getAttribute('data-id');
-        let name = select.getAttribute('data-name');
-        let status = select.value;
-        let no = select.closest('tr').cells[0].innerText;
-        
-        if(status === 'สาย' || status === 'ขาด' || status === 'ลาป่วย' || status === 'ลากิจ' || status === 'หนีเรียน') {
-          hasRows = true;
-          let statusColor = (status === 'สาย') ? '#d97706' : 'red'; 
-          htmlContent += `
-            <tr>
-              <td>${no}</td>
-              <td>${id}</td>
-              <td class="text-left">${name}</td>
-              <td><strong style="color:${statusColor};">${status}</strong></td>
-            </tr>
-          `;
-        }
-      });
-      if(!hasRows) {
-        htmlContent += `<tr><td colspan="4" style="color: green; font-weight:bold; padding: 15px;">✅ วันนี้นักเรียนมาเรียนครบถ้วนเรียบร้อยดี (ไม่มีคนขาด/สาย/ลา)</td></tr>`;
-      }
-
-      htmlContent += `
-          </tbody>
-        </table>
-
-        <div class="report-sign-area">
-          <table class="report-sign-table">
-            <tr>
-              <td>
-                ลงชื่อ..........................................................<br>
-                (..........................................................)<br>
-                ครูผู้สอน / ผู้รายงาน
-              </td>
-            </tr>
-            <tr>
-              <td>
-                ลงชื่อ..........................................................<br>
-                (..........................................................)<br>
-                หัวหน้ากลุ่มสาระการเรียนรู้
-              </td>
-            </tr>
-            <tr>
-              <td>
-                ลงชื่อ..........................................................<br>
-                (..........................................................)<br>
-                รองผู้อำนวยการกลุ่มบริหารวิชาการ
-              </td>
-            </tr>
-          </table>
-        </div>
-      `;
-
-      document.getElementById('reportModalContainer').innerHTML = htmlContent;
-      new bootstrap.Modal(document.getElementById('reportModal')).show();
-    }
-  </script>
+    </script>
 </body>
 </html>
