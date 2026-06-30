@@ -2,281 +2,132 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ระบบเช็คชื่อนักเรียนวงโยธวาทิตโรงเรียนโชคชัยสามัคคี</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CHK School System</title>
     
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;700&display=swap" rel="stylesheet">
-    
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#1565c0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="icon-192.png">
+
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
+
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Sarabun', sans-serif;
-        }
-
         body {
-            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.7)), 
-                        url('โยธวา.jpg') no-repeat center center fixed;
-            background-size: cover;
-            min-height: 100vh;
+            font-family: 'Sarabun', sans-serif;
+            background: linear-gradient(180deg, #ffffff 0%, #bbdefb 100%);
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
-            padding: 15px;
-        }
-
-        .login-container {
-            background: rgba(255, 255, 255, 0.98);
-            max-width: 450px;
-            width: 100%;
-            border-radius: 20px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
-            overflow: hidden;
-            display: block;
-        }
-
-        .login-header {
-            background: #ffffff;
-            padding: 35px 20px 20px 20px;
-            text-align: center;
-            border-bottom: 1px solid #f0f0f0;
-        }
-
-        .logo-img {
-            width: 120px;
-            height: 120px;
-            margin: 0 auto 15px auto;
-            display: block;
-            border-radius: 50%;
-            box-shadow: 0 6px 15px rgba(123, 44, 191, 0.25);
-            object-fit: cover;
-            background: white;
-            border: 4px solid #7B2CBF;
-        }
-
-        .main-title {
-            font-size: 22px;
-            font-weight: 700;
-            color: #3C096C; 
-            margin-bottom: 10px;
-            line-height: 1.4;
-        }
-
-        .sub-title-1, .sub-title-2 {
-            font-size: 11px; 
-            font-weight: 500;
-            color: #000000; 
-            line-height: 1.5;
+            justify-content: center;
+            height: 100vh;
             margin: 0;
-            display: block;
-        }
-
-        .login-body {
-            padding: 30px 25px;
-            background: #ffffff;
-        }
-
-        .form-view {
-            display: none;
-        }
-
-        .form-view.active {
-            display: block;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #333333;
-            font-size: 14px;
-            text-align: left;
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 12px 15px;
-            border: 2px solid #cbd5e1;
-            border-radius: 10px;
-            font-size: 16px;
-            transition: all 0.3s ease;
-            outline: none;
-            background: #f8fafc;
-            color: #333333;
-        }
-
-        .form-control:focus {
-            border-color: #7B2CBF;
-            background: #ffffff;
-            box-shadow: 0 0 0 3.5px rgba(123, 44, 191, 0.15);
-        }
-
-        .btn-submit {
-            display: block;
             text-align: center;
+            overflow: hidden;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px 20px;
+            border-radius: 25px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+            width: 85%;
+            max-width: 380px;
+        }
+        .logo { 
+            width: 120px; 
+            height: auto; 
+            margin-bottom: 15px; 
+            border-radius: 15px; 
+        }
+        h2 { 
+            color: #1565c0; 
+            font-size: 1.3rem; 
+            margin-bottom: 25px; 
+            line-height: 1.4; 
+        }
+        
+        .btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #4caf50;
+            color: white;
             text-decoration: none;
-            width: 100%;
-            padding: 14px;
-            background: linear-gradient(135deg, #7B2CBF 0%, #5A189A 100%);
-            border: none;
-            border-radius: 10px;
-            color: #ffffff;
-            font-size: 16px;
+            padding: 16px;
+            margin: 15px 0;
+            border-radius: 15px;
             font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 5px 15px rgba(123, 44, 191, 0.3);
-        }
-
-        .btn-submit:hover {
-            background: linear-gradient(135deg, #5A189A 0%, #3C096C 100%);
-            transform: translateY(-1.5px);
-            box-shadow: 0 7px 18px rgba(123, 44, 191, 0.4);
-        }
-
-        .toggle-btn-container {
-            margin-top: 25px;
-            text-align: center;
-            border-top: 1px solid #f1f5f9;
-            padding-top: 15px;
-        }
-
-        .toggle-link {
-            color: #7B2CBF;
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+            border: none;
             cursor: pointer;
         }
-
-        .toggle-link:hover {
-            text-decoration: underline;
+        .btn:active { 
+            transform: scale(0.96); 
+            background: #43a047;
+        }
+        
+        .btn-student { 
+            background: #2196f3; 
+            box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
+        }
+        .btn-student:active {
+            background: #1e88e5;
+        }
+        
+        .btn img { 
+            width: 32px; 
+            height: 32px; 
+            margin-right: 12px; 
         }
 
-        .footer-text {
-            text-align: center;
-            margin-top: 25px;
-            font-size: 11px;
-            color: #777777;
-            line-height: 1.4;
+        .footer { 
+            font-size: 0.75rem; 
+            color: #555; 
+            margin-top: 25px; 
+            line-height: 1.5; 
         }
     </style>
 </head>
 <body>
 
-    <div class="login-container">
-        <div class="login-header">
-            <img class="logo-img" src="icon-512.png" alt="CH SPEED BAND LOGO">
-            <div class="main-title">ระบบเช็คชื่อนักเรียนวงโยธวาทิต<br>โรงเรียนโชคชัยสามัคคี</div>
-            <span class="sub-title-1">สังกัดสำนักงานเขตพื้นที่การศึกษามัธยมศึกษานครราชสีมา</span>
-            <span class="sub-title-2">กระทรวงศึกษาธิการ</span>
-        </div>
+    <div class="container">
+        <img src="icon-192.png" alt="CHK School Logo" class="logo">
+        <h2>ระบบเช็คชื่อนักเรียน<br>โยธวาทิตโชคชัยสามัคคี</h2>
+        
+        <a href="https://script.google.com/macros/s/AKfycbyilYJ2BXmrOLzs9K0ExRAvGil2mNfQYGzeehklZ9L5oJj5WwhQig9oytLji1tcmVcJBA/exec" 
+           class="btn" 
+           target="_blank" 
+           rel="noopener noreferrer">
+            <img src="https://img.icons8.com/color/96/teacher.png" alt="Teacher">
+            เข้าสู่ระบบเช็คชื่อนักเรียน
+        </a>
 
-        <div class="login-body">
-            
-            <div id="loginView" class="form-view active">
-                <div class="form-group">
-                    <p style="text-align: center; color: #475569; font-size: 15px; margin-bottom: 20px;">
-                        คลิกปุ่มด้านล่างเพื่อเข้าสู่หน้าเว็บเช็คชื่อวงโยธวาทิต
-                    </p>
-                    <a href="https://script.google.com/macros/s/AKfycbyilYJ2BXmrOLzs9K0ExRAvGil2mNfQYGzeehklZ9L5oJj5WwhQig9oytLji1tcmVcJBA/exec" class="btn-submit">
-                        เข้าสู่ระบบเช็คชื่อ
-                    </a>
-                </div>
-                <div class="toggle-btn-container">
-                    <span style="font-size: 14px; color: #64748b;"></span>
-                    <a class="toggle-link" onclick="switchForm('updateView')"></a>
-                </div>
-            </div>
+        <a href="" 
+           class="btn btn-student" 
+           target="_blank" 
+           rel="noopener noreferrer">
+            <img src="https://img.icons8.com/color/96/student-male.png" alt="Student">
+            ยินดีต้อนรับ
+        </a>
 
-            <div id="updateView" class="form-view">
-                <form id="updateForm" onsubmit="submitData(event, 'updateForm')">
-                    <input type="hidden" name="action" value="update">
-                    <div class="form-group">
-                        <label>รหัสผ่านเดิมเพื่อยืนยันตัวตน</label>
-                        <input type="password" name="oldCode" class="form-control" placeholder="กรอกรหัสเก่าในชีต (เช่น 2345)" required>
-                    </div>
-                    <div class="form-group">
-                        <label>ต้องการเปลี่ยน ชื่อ-นามสกุล เป็น:</label>
-                        <input type="text" name="newName" class="form-control" placeholder="พิมพ์ชื่อใหม่ หรือปล่อยว่างหากไม่เปลี่ยน">
-                    </div>
-                    <div class="form-group">
-                        <label>ต้องการเปลี่ยน รหัสผ่านใหม่ เป็น:</label>
-                        <input type="password" name="newCode" class="form-control" placeholder="พิมพ์รหัสใหม่ หรือปล่อยว่างหากไม่เปลี่ยน">
-                    </div>
-                    <button type="submit" class="btn-submit" style="background: linear-gradient(135deg, #333 0%, #000 100%); width: 100%; border: none;">
-                        บันทึกข้อมูลใหม่ลง Google Sheets
-                    </button>
-                </form>
-                <div class="toggle-btn-container">
-                    <a class="toggle-link" onclick="switchForm('loginView')">ย้อนกลับไปหน้าแรก</a>
-                </div>
-            </div>
-
-            <div class="footer-text">
-                เชื่อมโยงข้อมูลแผ่นงาน "รหัส" อัตโนมัติ รองรับทุกแพลตฟอร์ม
-            </div>
+        <div class="footer">
+            โรงเรียนโชคชัยสามัคคี สพม.นครราชสีมา<br>
+            @ By wow-0854793190
         </div>
     </div>
 
     <script>
-        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyilYJ2BXmrOLzs9K0ExRAvGil2mNfQYGzeehklZ9L5oJj5WwhQig9oytLji1tcmVcJBA/exec";
-
-        function switchForm(viewId) {
-            const views = document.querySelectorAll('.form-view');
-            views.forEach(view => view.classList.remove('active'));
-            document.getElementById(viewId).classList.add('active');
-        }
-
-        function submitData(event, formId) {
-            event.preventDefault();
-            const form = document.getElementById(formId);
-            const button = form.querySelector('button[type="submit"]');
-            const originalText = button.innerText;
-            
-            button.disabled = true;
-            button.innerText = "กำลังประมวลผลระบบ...";
-
-            const formData = new FormData(form);
-            const searchParams = new URLSearchParams();
-            for (const pair of formData) {
-                searchParams.append(pair[0], pair[1]);
-            }
-
-            fetch(WEB_APP_URL, {
-                method: 'POST',
-                body: searchParams,
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                button.disabled = false;
-                button.innerText = originalText;
-                
-                alert(data.message);
-                
-                if(data.status === "success" && formId === "updateForm") {
-                    form.reset();
-                    switchForm('loginView');
-                }
-            })
-            .catch(error => {
-                button.disabled = false;
-                button.innerText = originalText;
-                alert("ระบบดำเนินการสำเร็จและบันทึกข้อมูลลงตาราง Sheets เรียบร้อยแล้วครับ!");
-                if(formId === "updateForm") {
-                    form.reset();
-                    switchForm('loginView');
-                }
+        // ลงทะเบียน Service Worker จากไฟล์ sw.js ที่คุณอัปโหลดไว้
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js').then(reg => {
+                    console.log('Service Worker Registered!');
+                }).catch(err => {
+                    console.log('Service Worker Failed!', err);
+                });
             });
         }
     </script>
