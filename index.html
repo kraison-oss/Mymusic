@@ -306,9 +306,6 @@
       </div>
     </div>
   </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
   <script>
     // 🌐 ตัวแปรหลักเก็บ Google Apps Script Web App URL ปลายทางที่คุณครูให้มา
     const webAppUrl = "https://script.google.com/macros/s/AKfycbyilYJ2BXmrOLzs9K0ExRAvGil2mNfQYGzeehklZ9L5oJj5WwhQig9oytLji1tcmVcJBA/exec";
@@ -417,18 +414,13 @@
       }
 
       if (navigator.onLine) {
-        fetch(`${webAppUrl}?action=getSubjectsWithStatus&room=${encodeURIComponent(roomValue)}&date=${date}`)
+      fetch(`${webAppUrl}?action=getSubjectsWithStatus&room=${encodeURIComponent(roomValue)}&date=${date}`)
         .then(response => response.json())
         .then(function(subjects) {
           renderSubjectDropdown(subjects);
         })
         .catch(err => console.error("เกิดข้อผิดพลาดในการโหลดวิชากลุ่มห้อง:", err));
-      } else {
-        db.subjects.toArray().then(subjects => {
-          renderSubjectDropdown(subjects.map(s => ({...s, isSaved: false})));
-        });
-      }
-    }
+    } else {
 
     function renderSubjectDropdown(subjects) {
       let select = document.getElementById('subjectSelect');
